@@ -73,9 +73,10 @@ async function updateWorkspaceColors() {
     // Get workspace configuration
     const workspaceConfig = vscode.workspace.getConfiguration();
     
-    // Update only the title bar color
+    // Update both active and inactive title bar colors
     const colors = {
-        'titleBar.activeBackground': titleBarColor
+        'titleBar.activeBackground': titleBarColor,
+        'titleBar.inactiveBackground': titleBarColor
     };
     
     await workspaceConfig.update(
