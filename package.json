@@ -1,10 +1,10 @@
 {
-    "name": "directory-colorizer",
-    "displayName": "Directory Colorizer",
-    "repository": "https://github.com/EQuineOntology/directory-colorizer",
-    "description": "Colors VS Code title bar based on workspace directory path patterns",
-    "version": "1.2.1",
-    "publisher": "cfratta",
+    "name": "project-colorizer",
+    "displayName": "Project Colorizer",
+    "repository": "https://github.com/mquinnv/directory-colorizer",
+    "description": "Sets titlebar color from .project-color or .iterm-color file in workspace root",
+    "version": "2.0.0",
+    "publisher": "mquinnv",
     "engines": {
         "vscode": "^1.74.0"
     },
@@ -13,8 +13,6 @@
     ],
     "keywords": [
         "colors",
-        "workspace",
-        "directory",
         "titlebar",
         "project"
     ],
@@ -23,67 +21,10 @@
     ],
     "main": "./out/extension.js",
     "contributes": {
-        "configuration": {
-            "title": "Directory Colorizer",
-            "properties": {
-                "directoryColorizer.pathColors": {
-                    "type": "object",
-                    "title": "Path Color Mappings",
-                    "description": "Map directory path patterns to title bar colors. Keys are path patterns, values are hex colors.",
-                    "default": {
-                        "my-project": "#33cc33",
-                        "work": "#3333cc",
-                        "personal": "#cc3333"
-                    },
-                    "patternProperties": {
-                        ".*": {
-                            "type": "string",
-                            "pattern": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
-                        }
-                    }
-                },
-                "directoryColorizer.matchType": {
-                    "type": "string",
-                    "title": "Path Matching Method",
-                    "enum": [
-                        "contains",
-                        "exact",
-                        "endsWith"
-                    ],
-                    "enumDescriptions": [
-                        "Path contains the pattern anywhere",
-                        "Path exactly matches the pattern",
-                        "Path ends with the pattern"
-                    ],
-                    "default": "contains",
-                    "description": "How to match path patterns against workspace paths"
-                },
-                "directoryColorizer.caseSensitive": {
-                    "type": "boolean",
-                    "title": "Case Sensitive Matching",
-                    "default": false,
-                    "description": "Whether path pattern matching should be case sensitive"
-                },
-                "directoryColorizer.autoApply": {
-                    "type": "boolean",
-                    "title": "Auto Apply Colors",
-                    "default": true,
-                    "description": "Automatically apply colors when workspace opens"
-                }
-            }
-        },
         "commands": [
             {
-                "command": "directoryColorizer.updateColors",
-                "title": "Directory Colorizer: Update Colors"
-            },
-            {
-                "command": "directoryColorizer.resetColors",
-                "title": "Directory Colorizer: Reset Colors"
-            },
-            {
-                "command": "directoryColorizer.addCurrentPath",
-                "title": "Directory Colorizer: Add Current Path"
+                "command": "projectColorizer.refresh",
+                "title": "Project Colorizer: Refresh"
             }
         ]
     },
@@ -91,10 +32,7 @@
         "vscode:prepublish": "npm run compile",
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
-        "package": "vsce package",
-        "release:patch": "vsce publish patch",
-        "release:minor": "vsce publish minor",
-        "release:major": "vsce publish major"
+        "package": "vsce package"
     },
     "devDependencies": {
         "@types/node": "16.x",
