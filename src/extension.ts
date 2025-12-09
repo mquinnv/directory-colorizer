@@ -1,4 +1,6 @@
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
 
 interface ExtensionConfig {
     pathColors: Record<string, string>;
@@ -35,15 +37,38 @@ function matchPath(workspacePath: string, pattern: string, matchType: string, ca
 
 function getColorForPath(workspacePath: string): string | null {
     const settings = getConfiguration();
-    
+
     // Find the first matching pattern
     for (const [pattern, color] of Object.entries(settings.pathColors)) {
         if (matchPath(workspacePath, pattern, settings.matchType, settings.caseSensitive)) {
             return color;
         }
     }
-    
+
     return null;
+}
+
+function getColorFromItermFile(workspacePath: string): string | null {
+    const filePath = path.join(workspacePath, '.iterm-color');
+
+    try {
+        if (!fs.existsSync(filePath)) {
+            return null;
+        }
+
+        const content = fs.readFileSync(filePath, 'utf-8').trim();
+
+        // Validate hex color format
+        if (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(content)) {
+            return content;
+        }
+
+        console.log('Invalid color format in .iterm-color file:', content);
+        return null;
+    } catch (error) {
+        console.log('Error reading .iterm-color file:', error);
+        return null;
+    }
 }
 
 async function updateWorkspaceColors() {
@@ -62,9 +87,16 @@ async function updateWorkspaceColors() {
     // Check the first workspace folder
     const firstFolder = workspaceFolders[0];
     const workspacePath = firstFolder.uri.fsPath;
-    
-    const titleBarColor = getColorForPath(workspacePath);
-    
+
+    // Try .iterm-color file first, then fall back to path patterns
+    let titleBarColor = getColorFromItermFile(workspacePath);
+    let colorSource = '.iterm-color file';
+
+    if (!titleBarColor) {
+        titleBarColor = getColorForPath(workspacePath);
+        colorSource = 'path pattern';
+    }
+
     if (!titleBarColor) {
         console.log('No matching color found for path:', workspacePath);
         return;
@@ -85,12 +117,7 @@ async function updateWorkspaceColors() {
         vscode.ConfigurationTarget.Workspace
     );
     
-    // Show status message
-    const matchingPattern = Object.entries(settings.pathColors).find(([pattern, color]) => 
-        color === titleBarColor && matchPath(workspacePath, pattern, settings.matchType, settings.caseSensitive)
-    )?.[0] || 'unknown';
-    
-    vscode.window.setStatusBarMessage(`Applied title bar color for pattern: ${matchingPattern}`, 3000);
+    vscode.window.setStatusBarMessage(`Applied title bar color from ${colorSource}`, 3000);
 }
 
 async function resetColors() {
