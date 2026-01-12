@@ -41,16 +41,16 @@ async function applyColor() {
 export function activate(context: vscode.ExtensionContext) {
     applyColor();
 
-    const watcher = vscode.workspace.createFileSystemWatcher(
+    const colorWatcher = vscode.workspace.createFileSystemWatcher(
         new vscode.RelativePattern(vscode.workspace.workspaceFolders![0], '.{project-color,iterm-color}')
     );
-    watcher.onDidChange(applyColor);
-    watcher.onDidCreate(applyColor);
-    watcher.onDidDelete(applyColor);
+    colorWatcher.onDidChange(applyColor);
+    colorWatcher.onDidCreate(applyColor);
+    colorWatcher.onDidDelete(applyColor);
 
     const refreshCommand = vscode.commands.registerCommand('projectColorizer.refresh', applyColor);
 
-    context.subscriptions.push(watcher, refreshCommand);
+    context.subscriptions.push(colorWatcher, refreshCommand);
 }
 
 export function deactivate() {}
